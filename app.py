@@ -55,7 +55,7 @@ st.markdown("""
 
 @st.cache_resource
 def load_model_components():
-    """Load model dan semua preprocessing components"""
+    """Load model and all preprocessing components"""
     try:
         # 1. Load XGBoost model
         model = joblib.load('failure_prediction_model.pkl')
@@ -75,12 +75,12 @@ def load_model_components():
         with open('features_info.pkl', 'rb') as f:
             features_used = pickle.load(f)
         
-        st.success("✅ Model dan components berhasil diload!")
+        st.success("✅ Model and components loaded successfully!")
         return model, label_encoder, label_mapping, type_mapping, features_used
         
     except Exception as e:
         st.error(f"❌ Error loading model: {str(e)}")
-        st.info("Pastikan semua file .pkl ada di folder yang sama dengan app.py")
+        st.info("Make sure all .pkl files are in the same folder as app.py")
         return None, None, None, None, None
 
 # Load components
@@ -89,64 +89,64 @@ model, label_encoder, label_mapping, type_mapping, features_used = load_model_co
 # Failure type information
 FAILURE_INFO = {
     'No Failure': {
-        'description': 'Mesin beroperasi normal',
+        'description': 'The machine operates normally',
         'icon': '✅',
         'color': '#10b981',
         'actions': [
-            'Lanjutkan operasi normal',
-            'Pertahankan jadwal maintenance rutin',
-            'Pantau parameter kunci'
+            'Continue normal operation',
+            'Maintain a regular maintenance schedule',
+            'Monitor key parameters'
         ],
         'severity': 'Low'
     },
     'Heat Dissipation Failure': {
-        'description': 'Gagal disipasi panas - sistem pendingin bermasalah',
+        'description': 'Heat dissipation failure - cooling system problem',
         'icon': '🔥',
         'color': '#ef4444',
         'actions': [
-            'Cek sistem pendingin segera',
-            'Bersihkan kipas dan heatsink',
-            'Pantau suhu secara ketat'
+            'Check the cooling system immediately',
+            'Clean the fan and heatsink',
+            'Monitor temperature closely'
         ],
         'severity': 'High'
     },
     'Power Failure': {
-        'description': 'Gagal daya - masalah suplai listrik',
+        'description': 'Power failure - power supply problem',
         'icon': '⚡',
         'color': '#f59e0b',
         'actions': [
-            'Periksa koneksi daya',
-            'Cek stabilizer dan UPS',
-            'Verifikasi tegangan input'
+            'Check power connections',
+            'Check the stabilizer and UPS',
+            'Verify input voltage'
         ],
         'severity': 'High'
     },
     'Overstrain Failure': {
-        'description': 'Gagal kelebihan beban - stres mekanis berlebihan',
+        'description': 'Overload failure - excessive mechanical stress',
         'icon': '💪',
         'color': '#8b5cf6',
         'actions': [
-            'Kurangi beban operasional',
-            'Cek alignment dan vibration',
-            'Inspeksi bearing dan gear'
+            'Reduce operational expenses',
+            'Check alignment and vibration',
+            'Bearing and gear inspection'
         ],
         'severity': 'Medium'
     },
     'Tool Wear Failure': {
-        'description': 'Gagal keausan tool - alat potong sudah aus',
+        'description': 'Tool wear failure - the cutting tool is worn out',
         'icon': '⚒️',
         'color': '#3b82f6',
         'actions': [
-            'Ganti tool yang aus',
-            'Cek ketajaman cutting edge',
-            'Atur ulang parameter machining'
+            'Replace worn tools',
+            'Check the sharpness of the cutting edge',
+            'Reset machining parameters'
         ],
         'severity': 'Medium'
     }
 }
 
 def prepare_input_data(input_dict):
-    """Prepare input untuk prediction"""
+    """Prepare input for prediction"""
     try:
         # Convert to DataFrame
         input_df = pd.DataFrame([input_dict])
@@ -169,7 +169,7 @@ def prepare_input_data(input_dict):
         return None
 
 def make_prediction(input_data):
-    """Lakukan prediksi menggunakan model"""
+    """Make predictions using the model"""
     try:
         # Prepare input
         input_df = prepare_input_data(input_data)
@@ -193,87 +193,87 @@ def main():
     # Header
     st.markdown("""
     <div class="main-header">
-        <h1>⚙️ SISTEM PREDIKSI KERUSAKAN MESIN</h1>
-        <p>Deteksi dini jenis kerusakan mesin berbasis Machine Learning</p>
+        <h1>⚙️ MACHINE FAILURE PREDICTION SYSTEM</h1>
+        <p>Early detection of machine damage types based on Machine Learning</p>
     </div>
     """, unsafe_allow_html=True)
     
     # Sidebar - Input Parameters
     with st.sidebar:
-        st.header("⚙️ Parameter Mesin")
+        st.header("⚙️ Machine Parameters")
         st.markdown("---")
         
         # Machine Type
-        st.subheader("1. Tipe Mesin")
+        st.subheader("1. Machine Type")
         machine_type = st.radio(
-            "Kualitas Produk",
-            options=["Rendah (L)", "Sedang (M)", "Tinggi (H)"],
+            "Product Quality",
+            options=["Low (L)", "Medium (M)", "High (H)"],
             index=1,
-            help="L: 50% produk, M: 30%, H: 20%"
+            help="L: 50% product, M: 30%, H: 20%"
         )
         type_code = machine_type[-2]
         
         # Sensor Parameters
-        st.subheader("2. Parameter Sensor")
+        st.subheader("2. Sensor Parameters")
         
         col1, col2 = st.columns(2)
         with col1:
             air_temp = st.number_input(
-                "Suhu Udara (K)",
+                "Air Temperature (K)",
                 min_value=295.0,
                 max_value=304.5,
                 value=300.0,
                 step=0.1,
-                help="Suhu lingkungan sekitar mesin"
+                help="Environmental temperature around the machine"
             )
             
             process_temp = st.number_input(
-                "Suhu Proses (K)",
+                "Process Temperature (K)",
                 min_value=305.7,
                 max_value=313.8,
                 value=310.0,
                 step=0.1,
-                help="Suhu internal selama operasi"
+                help="Internal temperature during operation"
             )
         
         with col2:
             rotational_speed = st.number_input(
-                "Kecepatan Rotasi (rpm)",
+                "Rotational Speed ​​(rpm)",
                 min_value=1168,
                 max_value=2886,
                 value=1500,
                 step=10,
-                help="Kecepatan putar mesin"
+                help="Machine rotation speed"
             )
             
             torque = st.number_input(
-                "Torsi (Nm)",
+                "Torque (Nm)",
                 min_value=3.8,
                 max_value=76.6,
                 value=40.0,
                 step=0.1,
-                help="Gaya putar yang dihasilkan"
+                help="The resulting rotating force"
             )
         
         tool_wear = st.slider(
-            "Keausan Tool (menit)",
+            "Tool Wear (minutes)",
             min_value=0,
             max_value=253,
             value=100,
-            help="Akumulasi waktu pakai tool"
+            help="Accumulated tool usage time"
         )
         
         st.markdown("---")
         
         # Predict Button
         predict_btn = st.button(
-            "🚀 PREDIKSI JENIS KERUSAKAN",
+            "🚀 DAMAGE TYPE PREDICTION",
             type="primary",
             use_container_width=True
         )
         
         # Info
-        with st.expander("ℹ️ Informasi Dataset"):
+        with st.expander("ℹ️ Dataset Information"):
             st.write("""
             **Dataset:** Predictive Maintenance Classification
             **Samples:** 10,000
@@ -287,17 +287,17 @@ def main():
     
     with col_left:
         # Current Status
-        st.subheader("📊 Status Mesin Saat Ini")
+        st.subheader("📊 Current Machine Status")
         
         # Metrics
         cols = st.columns(4)
         metrics_data = [
-            ("Tipe Mesin", machine_type, "⚙️"),
-            ("Suhu Udara", f"{air_temp} K", "🌡️"),
-            ("Suhu Proses", f"{process_temp} K", "🔥"),
-            ("Kecepatan", f"{rotational_speed} rpm", "⚡"),
-            ("Torsi", f"{torque} Nm", "🔧"),
-            ("Tool Wear", f"{tool_wear} menit", "⏱️")
+            ("Machine Type", machine_type, "⚙️"),
+            ("Air temperature", f"{air_temp} K", "🌡️"),
+            ("Process Temperature", f"{process_temp} K", "🔥"),
+            ("Speed", f"{rotational_speed} rpm", "⚡"),
+            ("Torque", f"{torque} Nm", "🔧"),
+            ("Tool Wear", f"{tool_wear} minute", "⏱️")
         ]
         
         for i, (label, value, icon) in enumerate(metrics_data):
@@ -305,16 +305,16 @@ def main():
                 st.metric(label, value)
     
     with col_right:
-        st.subheader("🎯 Model Info")
+        st.subheader("🎯 Info Model")
         
         if model is not None:
-            st.success("Model siap digunakan!")
-            st.info(f"**Classes:** {len(label_encoder.classes_)} jenis kerusakan")
+            st.success("The model is ready to use!")
+            st.info(f"**Classes:** {len(label_encoder.classes_)} type of damage")
             st.info(f"**Features:** {len(features_used)} parameter input")
         
         # Quick Stats
         st.markdown("---")
-        st.caption("**Statistik Dataset:**")
+        st.caption("**Dataset Statistics:**")
         st.caption("✅ No Failure: 96.6%")
         st.caption("⚠️ Failure Cases: 3.4%")
     
@@ -333,7 +333,7 @@ def main():
         st.markdown("---")
         
         # Show loading
-        with st.spinner("Menganalisis data mesin..."):
+        with st.spinner("Analyze machine data..."):
             prediction, probabilities = make_prediction(input_data)
         
         if prediction is not None:
@@ -343,52 +343,52 @@ def main():
             
             st.markdown(f"""
             <div class="prediction-card {'failure' if is_failure else 'no-failure'}">
-                <h2>{info.get('icon', '')} HASIL PREDIKSI: {prediction}</h2>
+                <h2>{info.get('icon', '')} PREDICTION RESULTS: {prediction}</h2>
                 <p><strong>Deskripsi:</strong> {info.get('description', '')}</p>
-                <p><strong>Tingkat Keparahan:</strong> {info.get('severity', '')}</p>
+                <p><strong>Severity Level:</strong> {info.get('severity', '')}</p>
             </div>
             """, unsafe_allow_html=True)
             
             # Confidence
             confidence = probabilities[label_encoder.transform([prediction])[0]]
-            st.subheader(f"🔄 Tingkat Keyakinan: {confidence:.2%}")
+            st.subheader(f"🔄 Confidence Level: {confidence:.2%}")
             st.progress(float(confidence))
             
             # REKOMENDASI
-            st.subheader("📋 Rekomendasi Tindakan")
+            st.subheader("📋 Recommended Action")
             
             if is_failure:
-                st.warning("**⚠️ PERLU TINDAKAN SEGERA:**")
+                st.warning("**⚠️ IMMEDIATE ACTION NEEDED:**")
                 for i, action in enumerate(info.get('actions', []), 1):
                     st.write(f"{i}. {action}")
                 
                 # Emergency contact
                 st.error("""
-                **🆘 Kontak Emergency:**
-                - Teknisi: (021) 1234-5678
+                **🆘 Emergency Contact:**
+                - Technician: (021) 1234-5678
                 - Supervisor: 0812-3456-7890
                 - Email: maintenance@company.com
                 """)
             else:
-                st.success("**✅ OPERASI NORMAL:**")
+                st.success("**✅ NORMAL OPERATION:**")
                 for i, action in enumerate(info.get('actions', []), 1):
                     st.write(f"{i}. {action}")
             
             # PROBABILITY DISTRIBUTION
-            st.subheader("📈 Distribusi Probabilitas")
+            st.subheader("📈 Probability Distribution")
             
             # Create probability dataframe
             prob_df = pd.DataFrame({
-                'Jenis Kerusakan': label_encoder.classes_,
+                'Type of Damage': label_encoder.classes_,
                 'Probabilitas': probabilities
             }).sort_values('Probabilitas', ascending=False)
             
             # Bar chart
             fig, ax = plt.subplots(figsize=(10, 5))
             colors = [info['color'] if cls == prediction else '#cccccc' 
-                     for cls in prob_df['Jenis Kerusakan']]
+                     for cls in prob_df['Type of Damage']]
             
-            bars = ax.barh(prob_df['Jenis Kerusakan'], 
+            bars = ax.barh(prob_df['Type of Damage'], 
                           prob_df['Probabilitas'], 
                           color=colors)
             ax.set_xlabel('Probabilitas', fontsize=12)
@@ -423,7 +423,7 @@ def main():
                 fig2, ax2 = plt.subplots(figsize=(10, 4))
                 bars2 = ax2.barh(feat_df['Feature'], feat_df['Importance'])
                 ax2.set_xlabel('Importance Score')
-                ax2.set_title('Pengaruh Parameter terhadap Prediksi')
+                ax2.set_title('The Influence of Parameters on Prediction')
                 
                 # Color bars
                 for bar in bars2:
@@ -433,11 +433,11 @@ def main():
                 st.pyplot(fig2)
             
             # EXPORT REPORT
-            st.subheader("📥 Export Laporan")
+            st.subheader("📥 Export Report")
             
             col_exp1, col_exp2, col_exp3 = st.columns(3)
             with col_exp1:
-                if st.button("📋 Simpan sebagai CSV"):
+                if st.button("📋 Save as CSV"):
                     report_df = pd.DataFrame([{
                         **input_data,
                         'Prediction': prediction,
@@ -445,39 +445,39 @@ def main():
                         'Timestamp': pd.Timestamp.now()
                     }])
                     report_df.to_csv('prediction_report.csv', index=False)
-                    st.success("Laporan disimpan!")
+                    st.success("The report is saved!")
             
             with col_exp2:
                 if st.button("🖨️ Print Summary"):
                     st.info("""
                     **SUMMARY:**
-                    Prediksi: {}
+                    Prediction: {}
                     Confidence: {:.2%}
-                    Waktu: {}
+                    Time: {}
                     """.format(prediction, confidence, pd.Timestamp.now()))
     
     # ABOUT SECTION
-    with st.expander("📚 Tentang Aplikasi Ini"):
+    with st.expander("📚 About This Application"):
         st.write("""
         ### Predictive Maintenance System
         
-        **Tujuan:**
-        Memprediksi jenis kerusakan mesin spesifik untuk membuat proses maintenance lebih efisien dan mengurangi downtime produksi.
+        **Objective:**
+        Predicting specific machine damage types to make maintenance processes more efficient and reduce production downtime.
         
-        **Jenis Kerusakan yang Diprediksi:**
-        1. **No Failure** - Mesin beroperasi normal
-        2. **Heat Dissipation Failure** - Masalah sistem pendingin
-        3. **Power Failure** - Masalah suplai daya listrik
-        4. **Overstrain Failure** - Kelebihan beban mekanis
-        5. **Tool Wear Failure** - Keausan alat potong
+        **Predicted Type of Damage:**
+        1. **No Failure** - Machine operating normally
+        2. **Heat Dissipation Failure** - Cooling system problem
+        3. **Power Failure** - Power supply problem
+        4. **Overstrain Failure** - Mechanical overload
+        5. **Tool Wear Failure** - Cutting tool wear
         
-        **Teknologi:**
+        **Technology:**
         - Machine Learning: XGBoost Classifier
         - Framework: Scikit-learn, Streamlit
         - Deployment: Streamlit Cloud
         
         **Developed by:** Fauzan Jaelani
-        **Untuk:** Final Project Data Science
+        **For:** Final Project Data Science
         """)
 
 if __name__ == "__main__":
